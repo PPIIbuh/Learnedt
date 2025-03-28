@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tyre Subitizing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+    }
+    #tyre-display {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+    }
+    .tyre {
+      width: 100px;
+      height: 100px;
+    }
+    #input-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #genie {
+      display: none;
+      animation: vibrate 0.1s infinite;
+      width: 400px;
+      margin-top: 20px;
+    }
+    @keyframes vibrate {
+      0% { transform: translate(0px, 0px); }
+      25% { transform: translate(2px, -2px); }
+      50% { transform: translate(-2px, 2px); }
+      75% { transform: translate(2px, 2px); }
+      100% { transform: translate(-2px, -2px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="tyre-display"></div>
+  <div id="input-panel">
+    <input type="number" id="user-input" min="1" max="10" placeholder="Enter number">
+    <button onclick="checkAnswer()">Submit</button>
+    <p id="message"></p>
+    <img src="lambo Genie pic.jpg" id="genie">
+  </div>
+
+  <audio id="rev-sound" src="rev.mp3"></audio>
+  <audio id="horn-sound" src="horn.mp3"></audio>
+  <audio id="brake-sound" src="brake.mp3"></audio>
+  <audio id="crash-sound" src="crash.mp3"></audio>
+
+  <script>
+    (() => {
+      const tyreSrc = 'Screenshot 2025-03-28 at 9.46.32 pm.png';
+      let correctStreak = 0;
+      let currentCount = 0;
+      let timeout1, timeout2;
+
+      function generateTyres() {
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        document.getElementById('message').textContent = '';
+        document.getElementById('user-input').value = '';
+        const display = document.getElementById('tyre-display');
+        display.innerHTML = '';
+        currentCount = Math.floor(Math.random() * 10) + 1;
+        for (let i = 0; i < currentCount; i++) {
+          const img = document.createElement('img');
+          img.src = tyreSrc;
+          img.classList.add('tyre');
+          display.appendChild(img);
+        }
+        timeout1 = setTimeout(() => document.getElementById('brake-sound').play(), 5000);
+        timeout2 = setTimeout(() => document.getElementById('crash-sound').play(), 10000);
+      }
+
+      window.checkAnswer = function () {
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        const input = parseInt(document.getElementById('user-input').value);
+        if (input === currentCount) {
+          document.getElementById('rev-sound').play();
+          correctStreak++;
+          if (correctStreak >= 10) {
+            showGenie();
+            correctStreak = 0;
+          } else {
+            generateTyres();
+          }
+        } else {
+          document.getElementById('horn-sound').play();
+          correctStreak = 0;
+        }
+      }
+
+      function showGenie() {
+        const genie = document.getElementById('genie');
+        genie.style.display = 'block';
+        document.getElementById('rev-sound').play();
+        setTimeout(() => {
+          genie.style.display = 'none';
+          generateTyres();
+        }, 4000);
+      }
+
+      window.onload = generateTyres;
+    })();
+  </script>
+</body>
+</html>
